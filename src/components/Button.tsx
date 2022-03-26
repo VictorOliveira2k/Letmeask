@@ -16,7 +16,7 @@ export function Button({ isOutlined = false, ...props}: ButtonProps) {
     </button>
   )
 
-}
+} 
 
 
 

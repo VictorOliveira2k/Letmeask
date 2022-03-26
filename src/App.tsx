@@ -19,7 +19,7 @@ function App() {
           <Route path='/rooms/:id' component={Room}></Route>
           <Route path='/admin/rooms/:id' component={AdminRoom}></Route>
         </Switch> 
-      </AuthContextProvider>
+      </AuthContextProvider> 
     </BrowserRouter>
   );
 }
