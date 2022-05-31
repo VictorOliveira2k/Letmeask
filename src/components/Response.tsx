@@ -1,9 +1,10 @@
 import { ReactNode } from 'react'
 import cx from 'classnames'
 
+
 import '../styles/question.scss'
 
-type QuestionProps = {
+type ResponseProps = {
   content: string;
   author: {
     name: string;
@@ -16,17 +17,17 @@ type QuestionProps = {
 }
 
 
-export function Question ({
+export function Response ({
   content,
   author,
   isAnswered = false,
   isHighlighted = false,
   children,
   isResponse,
-}: QuestionProps) {
+}: ResponseProps) {
   return (
     <div className={cx(
-      'question',
+      'response',
       { answered: isAnswered},
       { highlighted: isHighlighted && !isAnswered},
     )}>
@@ -37,7 +38,7 @@ export function Question ({
           <span>{author.name}</span>
         </div>
         <div>
-          {children}
+          
         </div>
       </footer>
       

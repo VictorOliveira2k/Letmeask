@@ -1,17 +1,21 @@
 import { useHistory, useParams  } from 'react-router-dom'
 
+import toast from 'react-hot-toast'
 import logoImg from '../assets/images/logo.svg'
 import deleteImg from '../assets/images/delete.svg'
 import checkImg from '../assets/images/check.svg'
 import answerImg from '../assets/images/answer.svg'
 
+// import '../styles/response'
 import { Button } from '../components/Button'
 import { Question } from '../components/Question'
 import { RoomCode } from '../components/RoomCode'
-// import { useAuth } from '../hooks/useAuth'
+import { Response } from '../components/Response'
 import { useRoom } from '../hooks/useRoom'
 import '../styles/room.scss'
 import { database } from '../services/firebase'
+import { useAuth } from '../hooks/useAuth'
+import { useState, FormEvent } from 'react'
 
 
 
@@ -22,8 +26,9 @@ type RoomParams = {
 }
 
 export function AdminRoom() {
-  // const {user} = useAuth()
+  const {user} = useAuth()
   const history = useHistory()
+  const [ newResponse, setNewResponse] = useState('')
   const params = useParams<RoomParams>()
   const roomId = params.id
 
@@ -55,6 +60,31 @@ export function AdminRoom() {
     }
   }
 
+  async function handleSendResponse(event: FormEvent){
+    event.preventDefault()
+
+    if (newResponse.trim() === ''){
+      return
+    }
+
+    if(!user){
+      toast.error("This didn't work.")
+    }
+
+    const response = {
+      content: newResponse,
+      author: {
+        name: user?.name,
+        avatar: user?.avatar,
+      },
+      isHighlighted: false,
+      isAnswered: false,
+    }
+  
+    await database.ref(`rooms/${roomId}/questions`).push(response)
+    
+    setNewResponse('')
+  }
 
   return (
     <div id="page-room">
@@ -76,7 +106,9 @@ export function AdminRoom() {
         <div className="question-list">
           {questions.map(question => {
             return (
-              <Question
+              
+              <>
+                <Question
                 key={question.id}
                 content={question.content}
                 author={question.author}
@@ -84,30 +116,65 @@ export function AdminRoom() {
                 isHighlighted={question.isHighlighted}
 
               >
-                {!question.isAnswered && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => handleCheckQuestionAsAnswered(question.id)}
-                    >
-                      <img src={checkImg} alt="Marcar pergunta como respondida" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleHighlightQuestion(question.id)}
-                    >
-                      <img src={answerImg} alt="Destacar pergunta" />
-                    </button>
-                  </>
-                )}
-                <button
-                  type="button"
-                  onClick={() => handleDeleteQuestion(question.id)}
-                >
-                  <img src={deleteImg} alt="Remover pergunta" />
-                </button>
+                <div>
+                  <form action="" placeholder="escreva sua resposta"></form>
+                  {!question.isAnswered && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => handleCheckQuestionAsAnswered(question.id)}
+                      >
+                        <img src={checkImg} alt="Marcar pergunta como respondida" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleHighlightQuestion(question.id)}
+                      >
+                        <img src={answerImg} alt="Destacar pergunta" />
+                      </button>
+                    </>
+                 )}
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteQuestion(question.id)}
+                  >
+                    <img src={deleteImg} alt="Remover pergunta" />
+                  </button>
+                </div>
+
+
+                  <form 
+                    className="response"
+                    onSubmit={handleSendResponse}>
+                    <textarea 
+                      placeholder="Digite sua resposta"
+                      onChange={event => setNewResponse(event.target.value)}
+                      value={newResponse}
+                    ></textarea>
+                    
+                    <div className='form-footer'>
+                      { user ? (
+                        <div className="user-info">
+                          <img src={user.avatar} alt={user.name} />
+                          <span>{user.name}</span>
+                        </div>
+                      ) : (
+                        <span>Para enviar uma pergunta, <button>faça seu login</button>.</span>
+                      ) }
+                      <Button 
+                        type="submit"
+                        disabled={!user}
+                      >Enviar resposta</Button>
+                    </div>
+                  </form>
+                
+
               </Question>
+              
+              </>
+              
             )
+            
           })}
         </div>
       </main>
