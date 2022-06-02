@@ -1,4 +1,4 @@
-## [Clique aqui](letmeask-9ab4d.web.app) para navegar no Letmeak.
+## Acesse letmeask-9ab4d.web.app para navegar no Letmeak.
 
 
 ## 🧪 Tecnologias
